@@ -10,6 +10,11 @@ class_name CameraRig extends Node3D
 @export var stick_sensitivity: float = 2.5
 @export var pitch_min_deg: float = -60.0
 @export var pitch_max_deg: float = 45.0
+# Auto-realign pulls the camera behind the player on sustained forward
+# motion. In M2 testing this fought mouse-look when strafing (A/D
+# rotates the player body; realign then chased it). Off by default —
+# flip in the inspector if you want the OoT-style snap-behind feel.
+@export var auto_realign_enabled: bool = false
 @export var realign_delay: float = 1.5
 @export var realign_speed_threshold: float = 1.0
 @export var realign_rate: float = 4.0
@@ -81,7 +86,7 @@ func _process(delta: float) -> void:
 
 	# Auto-realign behind player: triggered by idle camera + forward motion.
 	# Using -velocity.dot(basis.z) for forward speed handles backpedal naturally.
-	if not _lock_on_active and _time_since_cam_input >= realign_delay and _target is CharacterBody3D:
+	if auto_realign_enabled and not _lock_on_active and _time_since_cam_input >= realign_delay and _target is CharacterBody3D:
 		var cbody: CharacterBody3D = _target
 		var fs: float = -cbody.velocity.dot(cbody.basis.z)
 		if fs > realign_speed_threshold:

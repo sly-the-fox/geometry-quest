@@ -16,6 +16,7 @@ class_name Enemy extends CharacterBody3D
 
 var _flash_tween: Tween = null
 var _base_albedo: Color = Color.WHITE
+var _base_emission: Color = Color.BLACK
 
 
 func _ready() -> void:
@@ -25,6 +26,7 @@ func _ready() -> void:
 		var mat: StandardMaterial3D = src.duplicate()
 		body.material_override = mat
 		_base_albedo = mat.albedo_color
+		_base_emission = mat.emission
 	health_component.damaged.connect(_on_damaged)
 	health_component.released.connect(_on_released)
 
@@ -45,9 +47,16 @@ func _on_damaged(info: DamageInfo, _dealt: int) -> void:
 		return
 	if _flash_tween != null and _flash_tween.is_valid():
 		_flash_tween.kill()
+	# Tween albedo AND emission — emission dominates under the filmic
+	# tonemapper + bloom, so tinting albedo alone was invisible.
+	var flash: Color = Color(1.0, 0.15, 0.15, 1.0)
 	_flash_tween = create_tween()
-	_flash_tween.tween_property(mat, ^"albedo_color", Color(1.0, 0.25, 0.25, 1.0), 0.08)
+	_flash_tween.set_parallel(true)
+	_flash_tween.tween_property(mat, ^"albedo_color", flash, 0.08)
+	_flash_tween.tween_property(mat, ^"emission", flash, 0.08)
+	_flash_tween.chain().set_parallel(true)
 	_flash_tween.tween_property(mat, ^"albedo_color", _base_albedo, 0.08)
+	_flash_tween.tween_property(mat, ^"emission", _base_emission, 0.08)
 
 
 func _on_released() -> void:
