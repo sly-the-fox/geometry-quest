@@ -1,0 +1,6 @@
+[gd_resource type="StandardMaterial3D" format=3 uid="uid://bmat0worldstone"]
+
+[resource]
+albedo_color = Color(0.165, 0.184, 0.227, 1)
+metallic = 0.0
+roughness = 0.8

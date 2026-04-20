@@ -1,0 +1,81 @@
+[gd_scene load_steps=11 format=3 uid="uid://bplayer0000m1"]
+
+[ext_resource type="Script" path="res://player/player.gd" id="1_player"]
+[ext_resource type="Material" path="res://materials/mat_player.tres" id="2_matplayer"]
+[ext_resource type="PackedScene" path="res://player/camera_rig.tscn" id="3_camrig"]
+[ext_resource type="Script" path="res://player/states/state_machine.gd" id="4_sm"]
+[ext_resource type="Script" path="res://player/states/idle_state.gd" id="5_idle"]
+[ext_resource type="Script" path="res://player/states/move_state.gd" id="6_move"]
+[ext_resource type="Script" path="res://player/states/jump_state.gd" id="7_jump"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_body"]
+height = 1.8
+radius = 0.4
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_hurt"]
+height = 1.7
+radius = 0.38
+
+[sub_resource type="BoxMesh" id="BoxMesh_hint"]
+size = Vector3(0.08, 0.08, 0.08)
+
+[node name="Player" type="CharacterBody3D"]
+collision_layer = 2
+collision_mask = 133
+floor_snap_length = 0.0
+script = ExtResource("1_player")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+material_override = ExtResource("2_matplayer")
+
+[node name="DirectionHint" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, -0.45)
+mesh = SubResource("BoxMesh_hint")
+material_override = ExtResource("2_matplayer")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_body")
+
+[node name="Hurtbox" type="Area3D" parent="."]
+collision_layer = 32
+collision_mask = 528
+monitoring = true
+monitorable = true
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hurtbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.9, 0)
+shape = SubResource("CapsuleShape3D_hurt")
+
+[node name="WeaponSlot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.35, 1.0, -0.2)
+
+[node name="ShieldSlot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.35, 1.0, -0.2)
+
+[node name="HeadSlot" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.9, 0)
+
+[node name="CameraRig" parent="." instance=ExtResource("3_camrig")]
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("4_sm")
+
+[node name="idle" type="Node" parent="StateMachine"]
+script = ExtResource("5_idle")
+
+[node name="move" type="Node" parent="StateMachine"]
+script = ExtResource("6_move")
+
+[node name="jump" type="Node" parent="StateMachine"]
+script = ExtResource("7_jump")
+
+[node name="InteractRay" type="RayCast3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.0, 0)
+target_position = Vector3(0, 0, -2)
+collision_mask = 128
+
+[node name="LockOn" type="Node" parent="."]
+
+[node name="SlowmoAgent" type="Node" parent="."]

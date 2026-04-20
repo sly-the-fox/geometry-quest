@@ -1,0 +1,17 @@
+[gd_resource type="Environment" format=3 uid="uid://benv0debug0m1"]
+
+[resource]
+background_mode = 1
+background_color = Color(0.055, 0.071, 0.094, 1.0)
+ambient_light_source = 2
+ambient_light_color = Color(0.102, 0.122, 0.157, 1.0)
+ambient_light_energy = 0.3
+tonemap_mode = 3
+tonemap_exposure = 1.0
+glow_enabled = true
+glow_intensity = 0.8
+glow_bloom = 0.1
+glow_hdr_threshold = 1.0
+fog_enabled = true
+fog_density = 0.015
+fog_light_color = Color(0.29, 0.334, 0.4, 1.0)

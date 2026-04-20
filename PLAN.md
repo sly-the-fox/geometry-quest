@@ -60,16 +60,20 @@ Each milestone contains:
 **Files:**
 - `player/player.tscn` + `.gd` — movement per §8.2, state machine with Idle/Move/Jump (others stubbed).
 - `player/camera_rig.tscn` + `.gd` — Follow mode, `set_world_up(Vector3)` supported.
-- `player/states/player_state.gd` (base) + `idle_state.gd`, `move_state.gd`, `jump_state.gd`.
+- `player/states/player_state.gd` (base) + `idle_state.gd`, `move_state.gd`, `jump_state.gd`, `state_machine.gd`.
 - `meshes/polyhedra.gd` — implement `tetrahedron`, `cube`, `square_pyramid`, `pentagonal_star`, `hexagonal_prism`, `heptagon`, `octagonal_prism`, `merkaba`, `sphere_proc`.
 - `materials/mat_player.tres`, `mat_world_stone.tres`.
+- `environments/env_debug.tres` — minimum Environment (glow + Filmic + fog) so emissive shaders actually glow.
 - `shaders/resonance_glow.gdshader`.
 - `world/room.gd` base.
+- `scenes/debug_hud.gd` — dev overlay for vibes-based acceptance (toggle F1).
 
 **Key notes:**
-- Player body mesh: merkaba. Slow Y-rotation while idle.
-- Camera: soft-follow with `lerp_angle` on yaw/pitch, SpringArm3D for wall pull-in. Realign behind player after 1.5 s of no camera input + forward speed > 1.0.
-- Gamepad + mouse both working.
+- Player body mesh: merkaba. Slow Y-rotation while idle. `pulse_hz=0.2` (meditative).
+- Player scene includes `DirectionHint` tetrahedron child so the 4-fold-symmetric merkaba has a clear forward axis.
+- Camera: soft-follow with `lerp_angle` on yaw/pitch, SpringArm3D for wall pull-in. Realign behind player after 1.5 s of no camera input + forward speed > 1.0 (forward speed = `-velocity.dot(basis.z)` — handles backpedal).
+- Gamepad + mouse both working. `cam_up/cam_down/cam_left/cam_right` input actions added in M1.
+- **Dev-only:** During M1 iteration, `project.godot` `run/main_scene` swapped from `scenes/main.tscn` to `scenes/test_room.tscn`. **Revert before shipping M13** (reminder also at M13).
 
 **Acceptance:**
 - [ ] WASD + Space + mouse/gamepad all drive movement/camera without jitter.
@@ -364,6 +368,7 @@ Each milestone contains:
 **Depends on:** M12. **Est:** L.
 
 **Files:**
+- **First:** Revert `project.godot` `run/main_scene` from `res://scenes/test_room.tscn` back to `res://scenes/main.tscn`. This was swapped for M1 dev iteration (see M1 Key notes).
 - `world/region.gd` + `world/room.gd` full.
 - `world/door.tscn` + `.gd`, `world/trigger_volume.tscn` + `.gd`, `world/pickup.tscn` + `.gd`.
 - `globals/scene_router.gd` full: `change_room(region_id, room_id, spawn_name)` with threaded preload + fade + navmesh-already-baked skip.

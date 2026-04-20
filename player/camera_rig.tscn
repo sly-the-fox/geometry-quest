@@ -1,0 +1,19 @@
+[gd_scene load_steps=2 format=3 uid="uid://bcamrig0000m1"]
+
+[ext_resource type="Script" path="res://player/camera_rig.gd" id="1_cam"]
+
+[node name="CameraRig" type="Node3D"]
+script = ExtResource("1_cam")
+
+[node name="YawPivot" type="Node3D" parent="."]
+
+[node name="PitchPivot" type="Node3D" parent="YawPivot"]
+
+[node name="SpringArm3D" type="SpringArm3D" parent="YawPivot/PitchPivot"]
+spring_length = 4.5
+margin = 0.2
+collision_mask = 1
+
+[node name="Camera3D" type="Camera3D" parent="YawPivot/PitchPivot/SpringArm3D"]
+fov = 70.0
+current = true
