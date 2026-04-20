@@ -3,11 +3,15 @@ extends Node
 # Autoload registered as "SignalBus". No class_name — Godot 4.6 forbids a
 # class_name that collides with an autoload registration name.
 
-# Combat — 4
+# Combat — 5
 signal player_damaged(amount: int, source: Node3D)
 signal enemy_damaged(enemy: Node3D, info: DamageInfo)
 signal enemy_released(enemy: Node3D)
 signal boss_damaged(boss: Node3D, info: DamageInfo)
+# Pre-mitigation hook. Fires from Hurtbox.receive() before HealthComponent
+# applies damage. M11 block/parry reads this to veto damage within the
+# shield cone; M2 declares the signal but nothing listens.
+signal hurtbox_hit(hurtbox: Node, info: DamageInfo)
 
 # Canonical 4-phase boss flow — 9
 signal boss_encounter_started(boss: Node3D)

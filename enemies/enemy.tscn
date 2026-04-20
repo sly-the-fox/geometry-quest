@@ -1,0 +1,64 @@
+[gd_scene load_steps=10 format=3 uid="uid://benemy00000m2"]
+
+[ext_resource type="Script" path="res://enemies/enemy.gd" id="1_enemy"]
+[ext_resource type="Script" path="res://combat/hurtbox.gd" id="2_hurtbox"]
+[ext_resource type="Script" path="res://combat/health_component.gd" id="3_hc"]
+[ext_resource type="Script" path="res://combat/slowmo_agent.gd" id="4_slowmo"]
+[ext_resource type="Script" path="res://resources/stats.gd" id="5_stats"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_enemy"]
+size = Vector3(0.8, 0.8, 0.8)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_enemy"]
+albedo_color = Color(0.95, 0.85, 0.35, 1)
+emission_enabled = true
+emission = Color(0.95, 0.7, 0.2, 1)
+emission_energy_multiplier = 0.35
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_enemy_body"]
+size = Vector3(0.8, 0.8, 0.8)
+
+[sub_resource type="Resource" id="Stats_dummy"]
+script = ExtResource("5_stats")
+field_integrity_max = 5
+coherence = 8
+resonance = 8
+stability = 4
+flow = 8
+
+[node name="Enemy" type="CharacterBody3D"]
+collision_layer = 4
+collision_mask = 3
+floor_snap_length = 0.0
+script = ExtResource("1_enemy")
+
+[node name="Body" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+mesh = SubResource("BoxMesh_enemy")
+material_override = SubResource("StandardMaterial3D_enemy")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+shape = SubResource("BoxShape3D_enemy_body")
+
+[node name="Hurtbox" type="Area3D" parent="."]
+collision_layer = 64
+collision_mask = 8
+monitoring = true
+monitorable = true
+script = ExtResource("2_hurtbox")
+team = 1
+health_component = NodePath("../HealthComponent")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Hurtbox"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.4, 0)
+shape = SubResource("BoxShape3D_enemy_body")
+
+[node name="HealthComponent" type="Node" parent="."]
+script = ExtResource("3_hc")
+max_hp = 5
+team = 1
+local_stats = SubResource("Stats_dummy")
+
+[node name="SlowmoAgent" type="Node" parent="."]
+script = ExtResource("4_slowmo")

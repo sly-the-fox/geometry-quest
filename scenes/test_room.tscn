@@ -1,10 +1,12 @@
-[gd_scene load_steps=9 format=3 uid="uid://b0000testrm0m1"]
+[gd_scene load_steps=11 format=3 uid="uid://b0000testrm0m1"]
 
 [ext_resource type="Script" path="res://world/room.gd" id="1_room"]
 [ext_resource type="Environment" path="res://environments/env_debug.tres" id="2_env"]
 [ext_resource type="Material" path="res://materials/mat_world_stone.tres" id="3_stone"]
 [ext_resource type="PackedScene" path="res://player/player.tscn" id="4_player"]
 [ext_resource type="Script" path="res://scenes/debug_hud.gd" id="5_hud"]
+[ext_resource type="PackedScene" path="res://enemies/enemy.tscn" id="6_enemy"]
+[ext_resource type="Script" path="res://scenes/debug_damager.gd" id="7_damager"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_floor"]
 size = Vector3(30, 1, 30)
@@ -193,6 +195,13 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
 
 [node name="Player" parent="." instance=ExtResource("4_player")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1, 0)
+
+[node name="DummyEnemy" parent="." instance=ExtResource("6_enemy")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8, 1, 8)
+
+[node name="DebugDamager" type="Node" parent="."]
+script = ExtResource("7_damager")
+player = NodePath("../Player")
 
 [node name="DebugHUD" type="CanvasLayer" parent="."]
 script = ExtResource("5_hud")

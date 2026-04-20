@@ -20,10 +20,15 @@ var coyote_timer: float = 0.0
 var jump_buffer: float = 0.0
 var _suppress_coyote_refill: bool = false
 var _was_on_floor: bool = false
+var _iframe_blink_accum: float = 0.0
+
+const _ATTACKABLE_STATES: Array[StringName] = [&"idle", &"move"]
+const _IFRAME_BLINK_HZ: float = 12.0
 
 @onready var body: MeshInstance3D = $Body
 @onready var camera_rig: CameraRig = $CameraRig
 @onready var state_machine: StateMachine = $StateMachine
+@onready var health_component: HealthComponent = $HealthComponent
 
 
 func _ready() -> void:
@@ -35,6 +40,8 @@ func _ready() -> void:
 			s.parent = self
 			s.machine = state_machine
 	state_machine.call_deferred("change_state", &"idle")
+	health_component.local_stats = GameState.stats
+	health_component.damaged.connect(_on_damaged)
 
 
 func _physics_process(delta: float) -> void:
@@ -44,11 +51,15 @@ func _physics_process(delta: float) -> void:
 		_suppress_coyote_refill = false
 	_was_on_floor = is_on_floor()
 	_rotate_idle_body(delta)
+	_tick_iframe_blink(delta)
 
 
 func _unhandled_input(event: InputEvent) -> void:
 	if event.is_action_pressed(&"jump"):
 		jump_buffer = jump_buffer_duration
+	elif event.is_action_pressed(&"attack"):
+		if _can_attack():
+			state_machine.change_state(&"attack")
 
 
 # ─── Called by states ──────────────────────────────────────────────────
@@ -99,6 +110,32 @@ func try_consume_jump() -> bool:
 
 
 # ─── Internals ─────────────────────────────────────────────────────────
+
+func _can_attack() -> bool:
+	if state_machine.current == null:
+		return false
+	return state_machine.current.name in _ATTACKABLE_STATES
+
+
+func _on_damaged(info: DamageInfo, dealt: int) -> void:
+	# Player bridges HealthComponent → SignalBus so HealthComponent stays
+	# autoload-free (testable under --headless -s).
+	SignalBus.player_damaged.emit(dealt, info.source)
+	state_machine.change_state(&"hit", {"info": info})
+
+
+func _tick_iframe_blink(_delta: float) -> void:
+	if health_component == null:
+		return
+	if not health_component.is_invulnerable():
+		if not body.visible:
+			body.visible = true
+		_iframe_blink_accum = 0.0
+		return
+	_iframe_blink_accum += _delta
+	var period: float = 1.0 / _IFRAME_BLINK_HZ
+	body.visible = fmod(_iframe_blink_accum, period) < period * 0.5
+
 
 func _tick_timers(delta: float) -> void:
 	# Coyote timer refills only when firmly grounded (velocity.y <= 0) and
